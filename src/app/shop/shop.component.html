@@ -1,0 +1,37 @@
+<div class="min-h-screen bg-base-200 py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-8">Shop Our Collection</h2>
+
+    <!-- Sorting Dropdown -->
+    <div class="flex justify-end mb-6" >
+      <div class="dropdown">
+        <label tabindex="0" class="btn btn-outline btn-primary">
+          Sort By: {{ sortOption | titlecase }}
+        </label>
+        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52" style="z-index: 10000 !important;">
+          <li><a (click)="sortOption = 'name-asc'; sortItems()">Name (A-Z)</a></li>
+          <li><a (click)="sortOption = 'name-desc'; sortItems()">Name (Z-A)</a></li>
+          <li><a (click)="sortOption = 'price-asc'; sortItems()">Price (Low to High)</a></li>
+          <li><a (click)="sortOption = 'price-desc'; sortItems()">Price (High to Low)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for(item of items; track item.id) {
+        <div class="card bg-base-100 shadow-xl">
+          <figure><img src="{{item.image}}" alt="{{item.name}}" class="h-48 w-full object-cover" /></figure>
+          <div class="card-body">
+            <h2 class="card-title">{{item.name}}</h2>
+            <p>{{item.description}}</p>
+            <div class="card-actions justify-between items-center">
+              <span class="text-lg font-bold">₱{{item.price}}</span>
+              <button class="btn btn-primary" (click)="addToCart(item)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

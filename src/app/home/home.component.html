@@ -1,0 +1,34 @@
+<!-- Hero Section -->
+<section class="hero min-h-[70vh] bg-base-100" style="background-image: url('https://via.placeholder.com/1920x600');">
+  <div class="hero-overlay bg-opacity-60"></div>
+  <div class="hero-content text-center text-neutral-content">
+    <div class="max-w-md">
+      <h1 class="mb-5 text-5xl font-bold">Welcome to E-Shop</h1>
+      <p class="mb-5">Discover the best deals on your favorite products. Shop now and enjoy exclusive offers!</p>
+      <a href="#" class="btn btn-primary">Shop Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products -->
+<section class="py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-8">Featured Products</h2>
+    <!-- Featured Products -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (product of products; track product.id) {
+        <div class="card bg-base-100 shadow-xl">
+          <figure><img src="{{product.image}}" alt="{{product.name}}" class="h-48 w-full object-cover" /></figure>
+          <div class="card-body">
+            <h2 class="card-title">{{product.name}}</h2>
+            <p>{{product.description}}</p>
+            <div class="card-actions justify-between items-center">
+              <span class="text-lg font-bold">₱{{product.price}}</span>
+              <button class="btn btn-primary">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

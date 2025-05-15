@@ -1,0 +1,188 @@
+<div class="min-h-screen bg-base-200 py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-8">Vendor Dashboard</h2>
+
+    <!-- Earnings Overview -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h3 class="text-xl font-semibold mb-4">Earnings Overview</h3>
+        <div class="stats shadow">
+          <div class="stat">
+            <div class="stat-title">Total Earnings</div>
+            <div class="stat-value">₱{{earnings.total | number:'1.2-2'}}</div>
+            <div class="stat-desc">From completed orders</div>
+          </div>
+        </div>
+        <h4 class="text-lg font-semibold mt-6 mb-2">Recent Transactions</h4>
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Amount</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (transaction of earnings.transactions; track transaction.orderId) {
+                <tr>
+                  <td>{{transaction.orderId}}</td>
+                  <td>₱{{transaction.amount | number:'1.2-2'}}</td>
+                  <td>{{transaction.date}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Management -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h3 class="text-xl font-semibold mb-4">Recent Orders</h3>
+        <div *ngIf="orders.length === 0" class="text-center text-gray-500">
+          No orders available.
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orders; track order.id) {
+                <tr>
+                  <td>{{order.id}}</td>
+                  <td>{{order.customerName}}</td>
+                  <td>₱{{order.total | number:'1.2-2'}}</td>
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'badge-success': order.status === 'Completed',
+                      'badge-warning': order.status === 'Pending',
+                      'badge-error': order.status === 'Cancelled'
+                    }">{{order.status}}</span>
+                  </td>
+                  <td>{{order.date}}</td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" (click)="openOrderModal(order)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Management -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="text-xl font-semibold mb-4">Inventory</h3>
+        <div *ngIf="products.length === 0" class="text-center text-gray-500">
+          No products available.
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of products; track product.id) {
+                <tr>
+                  <td>
+                    <img src="{{product.image}}" alt="{{product.name}}" class="w-16 h-16 object-cover rounded" />
+                  </td>
+                  <td>{{product.name}}</td>
+                  <td>₱{{product.price | number:'1.2-2'}}</td>
+                  <td>{{product.stock}}</td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" (click)="openRestockModal(product)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <dialog id="order-modal" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Order #{{selectedOrder?.id}}</h3>
+        <div *ngIf="selectedOrder" class="space-y-4">
+          <p><strong>Customer:</strong> {{selectedOrder.customerName}}</p>
+          <p><strong>Total:</strong> ₱{{selectedOrder.total | number:'1.2-2'}}</p>
+          <p><strong>Status:</strong> {{selectedOrder.status}}</p>
+          <p><strong>Date:</strong> {{selectedOrder.date}}</p>
+          <h4 class="font-semibold">Items</h4>
+          <ul class="space-y-2">
+            @for (item of selectedOrder.items; track item.productId) {
+              <li>
+                {{item.name}} - {{item.quantity}} x ₱{{item.price | number:'1.2-2'}}
+              </li>
+            }
+          </ul>
+          <div class="form-control mt-4">
+            <label class="label">
+              <span class="label-text">Update Status</span>
+            </label>
+            <select class="select select-bordered" [(ngModel)]="selectedOrder.status" (change)="updateOrderStatus()">
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-action">
+          <button class="btn" (click)="closeOrderModal()">Close</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button (click)="closeOrderModal()">close</button>
+      </form>
+    </dialog>
+
+    <!-- Restock Modal -->
+    <dialog id="restock-modal" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Restock {{selectedProduct?.name}}</h3>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Quantity to Add</span>
+          </label>
+          <input type="number" [(ngModel)]="restockQuantity" min="0" class="input input-bordered" />
+        </div>
+        <div class="modal-action">
+          <button class="btn btn-primary" (click)="restockProduct()">Restock</button>
+          <button class="btn" (click)="closeRestockModal()">Cancel</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button (click)="closeRestockModal()">close</button>
+      </form>
+    </dialog>
+  </div>
+</div>

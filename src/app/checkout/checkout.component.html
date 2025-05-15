@@ -1,0 +1,117 @@
+<div class="min-h-screen bg-base-200 py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-8">Checkout</h2>
+
+    <!-- Cart Summary -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h3 class="text-xl font-semibold mb-4">Order Summary</h3>
+        @if (cartItems.length === 0) {
+          <div class="text-center text-gray-500">
+            Your cart is empty.
+          </div>
+        }
+
+        <ul class="space-y-4">
+          @for (item of cartItems; track item.id) {
+            <li class="flex items-center gap-4">
+              <img src="{{item.image}}" alt="{{item.name}}" class="w-16 h-16 object-cover rounded" />
+              <div class="flex-1">
+                <h4 class="font-semibold">{{item.name}}</h4>
+                <p>₱{{item.price | number:'1.2-2'}} x {{item.quantity}}</p>
+              </div>
+            </li>
+          }
+        </ul>
+        <div class="mt-4 text-right">
+          <p class="text-lg font-bold">Total: ₱{{calculateTotal() | number:'1.2-2'}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Method Selection -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="text-xl font-semibold mb-4">Payment Method</h3>
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text">Credit/Debit Card</span>
+            <input type="radio" name="paymentMethod" value="card" [(ngModel)]="paymentMethod" class="radio radio-primary" />
+          </label>
+          <label class="label cursor-pointer">
+            <span class="label-text">GCash</span>
+            <input type="radio" name="paymentMethod" value="gcash" [(ngModel)]="paymentMethod" class="radio radio-primary" />
+          </label>
+          <label class="label cursor-pointer">
+            <span class="label-text">Maya</span>
+            <input type="radio" name="paymentMethod" value="maya" [(ngModel)]="paymentMethod" class="radio radio-primary" />
+          </label>
+          <label class="label cursor-pointer">
+            <span class="label-text">Cash on Delivery</span>
+            <input type="radio" name="paymentMethod" value="cod" [(ngModel)]="paymentMethod" class="radio radio-primary" />
+          </label>
+        </div>
+
+        <!-- Card Details Form (Visible for Card Payment) -->
+        @if(paymentMethod === 'card') {
+          <div class="mt-4">
+            <h4 class="text-lg font-semibold mb-2">Card Details</h4>
+            <div class="form-control mb-2">
+              <label class="label">
+                <span class="label-text">Card Number</span>
+              </label>
+              <input type="text" [(ngModel)]="cardDetails.number" placeholder="1234 5678 9012 3456" class="input input-bordered" maxlength="19" />
+            </div>
+            <div class="flex gap-4">
+              <div class="form-control mb-2 flex-1">
+                <label class="label">
+                  <span class="label-text">Expiry Month</span>
+                </label>
+                <input type="text" [(ngModel)]="cardDetails.expMonth" placeholder="MM" class="input input-bordered" maxlength="2" />
+              </div>
+              <div class="form-control mb-2 flex-1">
+                <label class="label">
+                  <span class="label-text">Expiry Year</span>
+                </label>
+                <input type="text" [(ngModel)]="cardDetails.expYear" placeholder="YY" class="input input-bordered" maxlength="2" />
+              </div>
+              <div class="form-control mb-2 flex-1">
+                <label class="label">
+                  <span class="label-text">CVC</span>
+                </label>
+                <input type="text" [(ngModel)]="cardDetails.cvc" placeholder="123" class="input input-bordered" maxlength="4" />
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Payment Status -->
+         @if (paymentStatus){
+          <div class="alert mt-4" [ngClass]="{'alert-success': paymentStatus.includes('successful'), 'alert-error': paymentStatus.includes('failed'), 'alert-info': paymentStatus.includes('Cash')}">
+            {{paymentStatus}}
+          </div>
+         }
+
+
+        <!-- Checkout Button -->
+        <div class="mt-6">
+          @if (paymentMethod !== 'cod') {
+            <button class="btn btn-primary w-full" [disabled]="isLoading || !cardDetails.number || !cardDetails.expMonth || !cardDetails.expYear || !cardDetails.cvc" (click)="initiatePayment()">
+              {{isLoading ? 'Processing...' : 'Pay Now'}}
+            </button>
+          }
+          @else if (paymentMethod === 'cod') {
+            <button class="btn btn-primary w-full" [disabled]="isLoading" (click)="initiateCOD()">
+              {{isLoading ? 'Processing...' : 'Confirm COD'}}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to Shop -->
+    <div class="text-center mt-8">
+      <a routerLink="/shop" class="btn btn-outline btn-primary">Continue Shopping</a>
+    </div>
+  </div>
+</div>
