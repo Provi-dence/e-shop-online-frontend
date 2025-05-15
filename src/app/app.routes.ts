@@ -5,6 +5,7 @@ import { ShopComponent } from './shop/shop.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { VendorComponent } from './vendor/vendor.component';
 import { VendorDashboardComponent } from './vendor-dashboard/vendor-dashboard.component';
+import { AdminComponent } from './admin/admin.component';
 
 export const routes: Routes = [
   { path: 'auth', component: AuthComponent },
@@ -17,5 +18,8 @@ export const routes: Routes = [
 
   // vendor
   { path: 'vendor', component: VendorComponent },
-  { path: 'vendor-dashboard', component: VendorDashboardComponent}
+  { path: 'vendor-dashboard', component: VendorDashboardComponent},
+
+  // admin
+  { path: 'admin', component: AdminComponent}
 ];

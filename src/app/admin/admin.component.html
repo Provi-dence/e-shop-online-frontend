@@ -1,0 +1,147 @@
+<div class="min-h-screen bg-base-200 py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-8">Admin Dashboard</h2>
+
+    <!-- Dashboard Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body text-center">
+          <h3 class="text-lg font-semibold">Total Vendors</h3>
+          <p class="text-2xl font-bold">{{stats.totalVendors}}</p>
+        </div>
+      </div>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body text-center">
+          <h3 class="text-lg font-semibold">Total Products</h3>
+          <p class="text-2xl font-bold">{{stats.totalProducts}}</p>
+        </div>
+      </div>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body text-center">
+          <h3 class="text-lg font-semibold">Pending Vendors</h3>
+          <p class="text-2xl font-bold">{{stats.pendingVendors}}</p>
+        </div>
+      </div>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body text-center">
+          <h3 class="text-lg font-semibold">Open Disputes</h3>
+          <p class="text-2xl font-bold">{{stats.openDisputes}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor Management -->
+    <div class="card bg-base-100 shadow-xl mb-8">
+      <div class="card-body">
+        <h3 class="text-xl font-semibold mb-4">Vendor Registrations</h3>
+        <div *ngIf="vendors.length === 0" class="text-center text-gray-500">
+          No vendors available.
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (vendor of vendors; track vendor.id) {
+                <tr>
+                  <td>{{vendor.name}}</td>
+                  <td>{{vendor.email}}</td>
+                  <td>
+                    <span class="badge badge-{{vendor.status === 'pending' ? 'warning' : vendor.status === 'approved' ? 'success' : 'error'}}">
+                      {{vendor.status | titlecase}}
+                    </span>
+                  </td>
+                  <td>{{vendor.createdAt | date:'short'}}</td>
+                  <td>
+                    <button class="btn btn-success btn-sm mr-2" (click)="approveVendor(vendor.id)" *ngIf="vendor.status === 'pending'">
+                      Approve
+                    </button>
+                    <button class="btn btn-error btn-sm" (click)="rejectVendor(vendor.id)" *ngIf="vendor.status === 'pending'">
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dispute Management -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="text-xl font-semibold mb-4">Disputes</h3>
+        <div *ngIf="disputes.length === 0" class="text-center text-gray-500">
+          No disputes available.
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Vendor</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (dispute of disputes; track dispute.id) {
+                <tr>
+                  <td>{{dispute.orderId}}</td>
+                  <td>{{dispute.customerId}}</td>
+                  <td>{{dispute.vendorId}}</td>
+                  <td>
+                    <span class="badge badge-{{dispute.status === 'open' ? 'warning' : dispute.status === 'resolved' ? 'success' : 'error'}}">
+                      {{dispute.status | titlecase}}
+                    </span>
+                  </td>
+                  <td>{{dispute.createdAt | date:'short'}}</td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" (click)="openDisputeModal(dispute)">
+                      View
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dispute Modal -->
+    <dialog id="dispute-modal" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Dispute Details</h3>
+        <div *ngIf="selectedDispute" class="space-y-4">
+          <p><strong>Order ID:</strong> {{selectedDispute.orderId}}</p>
+          <p><strong>Customer ID:</strong> {{selectedDispute.customerId}}</p>
+          <p><strong>Vendor ID:</strong> {{selectedDispute.vendorId}}</p>
+          <p><strong>Description:</strong> {{selectedDispute.description}}</p>
+          <p><strong>Status:</strong> {{selectedDispute.status | titlecase}}</p>
+          <p><strong>Created:</strong> {{selectedDispute.createdAt | date:'short'}}</p>
+          <div class="flex gap-4 mt-4" *ngIf="selectedDispute.status === 'open'">
+            <button class="btn btn-success flex-1" (click)="resolveDispute(selectedDispute.id)">Resolve</button>
+            <button class="btn btn-warning flex-1" (click)="escalateDispute(selectedDispute.id)">Escalate</button>
+          </div>
+        </div>
+        <div class="modal-action">
+          <button class="btn btn-outline" (click)="closeDisputeModal()">Close</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button (click)="closeDisputeModal()">close</button>
+      </form>
+    </dialog>
+  </div>
+</div>
